@@ -12,26 +12,7 @@ V(n) :=r*q^2*(1-q^(n-1)) + r*(1-q^2)/(1-beta) ;
 V_p1 : r*(1-beta*q^2)/(1-beta) ;
 V_11 : r*(1-beta^2*q^2)/(1-beta) ;
 V_pp : r*p*(1+beta*q)/(1-beta) ;
-
-"***********************************************" ;
-/* The next step update functions for all cases */
-
-W10(n) := r*p + beta*V(n+1) ;
-W01(n) := r*Ap(n) + beta*V(1) ;
-W11(n) := r*(p+Ap(n) - 2*p*Ap(n)) + beta*p*Ap(n)*V_11 + beta*(1 - p*Ap(n))*V_pp ; 
-
-W10_p1 : r*p + beta*V(1) ;
-W01_p1 : r   + beta*V(1) ;
-W11_p1 : r*(1+p-2*p) + beta*p*V_11 + beta*(1-p)*V_pp ;
-
-W10_11 : r + beta*V_p1 ;
-W01_11 : r + beta*V_p1 ;
-W11_11 : beta*V_11 ;
-
-W10_pp : r*p + beta*V(1) ;
-W01_pp : r*p + beta*V(1) ;
-W11_pp : r*(2*p - 2*p^2) + beta*p^2*V_11 + beta*(1-p^2)*V_pp ;
-
+batch("next-step") ;
 
 "***********************************************" ;
 /* Check that the value function is a fixed point */
@@ -58,3 +39,7 @@ factorsum(W01_11 - W11_11) ;
 factorsum(W01_pp - W10_pp) ;
 factorsum(W01_pp - W11_pp) ;
 ratsimp((beta*(q-1)+2)*q-1) ;
+
+/* 
+  vim: ft=maxima 
+*/
