@@ -1,0 +1,60 @@
+/* It is easier to work with (1-p) rather than p.  */
+p : 1-q ;
+Ap(n) := 1 - q^(n+1) ;
+
+"***********************************************" ;
+/* The reachable set of the state space is :
+   (1,1), (p,p), (1,p), (p,1), (p, A^n p), (A^n p, p)
+   We define a value function for each of these
+*/
+
+V(n) :=r*q^2*(1-q^(n-1)) + r*(1-q^2)/(1-beta) ;
+V_p1 : r*(1-beta*q^2)/(1-beta) ;
+V_11 : r*(1-beta^2*q^2)/(1-beta) ;
+V_pp : r*p*(beta^3*q^3-beta^3*q^2+(2-3*beta)*q+beta)/((1-beta)*(beta*q^2-2*beta*q+1)) ;
+
+"***********************************************" ;
+/* The next step update functions for all cases */
+
+W10(n) := r*p + beta*V(n+1) ;
+W01(n) := r*Ap(n) + beta*V(1) ;
+W11(n) := r*(p+Ap(n) - 2*p*Ap(n)) + beta*p*Ap(n)*V_11 + beta*(1 - p*Ap(n))*V_pp ; 
+
+W10_p1 : r*p + beta*V(1) ;
+W01_p1 : r   + beta*V(1) ;
+W11_p1 : r*(1+p-2*p) + beta*p*V_11 + beta*(1-p)*V_pp ;
+
+W10_11 : r + beta*V_p1 ;
+W01_11 : r + beta*V_p1 ;
+W11_11 : beta*V_11 ;
+
+W10_pp : r*p + beta*V(1) ;
+W01_pp : r*p + beta*V(1) ;
+W11_pp : r*(2*p - 2*p^2) + beta*p^2*V_11 + beta*(1-p^2)*V_pp ;
+
+
+"***********************************************" ;
+/* Check that the value function is a fixed point */
+ratsimp(W01(n) - V(n)) ;
+ratsimp(W01_p1 - V_p1) ;
+ratsimp(W01_11 - V_11) ;
+ratsimp(W11_pp - V_pp) ;
+
+"***********************************************" ;
+/* Find differences W01 - W10 and W01 - W11 */
+factorsum(W01(n) - W10(n)) ;
+factorsum(W01(n) - W11(n)) ;
+ratsimp(q*(q^n*(beta*(beta*q+1)-2)-beta*(beta+1)*q)+1) ;
+
+"***********************************************" ;
+factorsum(W01_p1 - W10_p1) ;
+factorsum(W01_p1 - W11_p1) ;
+
+"***********************************************" ;
+factorsum(W01_11 - W10_11) ;
+factorsum(W01_11 - W11_11) ;
+
+"***********************************************" ;
+factorsum(W01_pp - W10_pp) ;
+factorsum(W01_pp - W11_pp) ;
+ratsimp((beta*(q-1)+2)*q-1) ;
