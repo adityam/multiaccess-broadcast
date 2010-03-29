@@ -1,0 +1,46 @@
+/* It is easier to work with (1-p) rather than p.  */
+p : 1-q ;
+Ap(n) := 1 - q^(n+1) ;
+
+"***********************************************" ;
+/* The reachable set of the state space is :
+   (1,1), (p,p), (1,p), (p,1), (p, A^n p), (A^n p, p)
+   we define a value function for each of these
+*/
+
+D : '(1 + p^2 + p^3) ;
+J : '(r*p*(1+p)*(1+q^2))/D ;
+
+v(n) := ev('(r*(2*(1-q^m)*p^3 - (1-2*q^m)*p^2 + (4+q^m)*p - 1 + q^m ))/D,
+          noeval, m=n);
+v_11 :  '(2*r) ;
+v_pp :  '(r*p*(3+p))/ D ;
+v_p1 :  '(J + r) ;
+
+array( check, 4) ;
+check[1] : '(v(1) + J - w11(1)) ;
+check[2] : '(v_p1 + J - w01_p1) ;
+check[3] : '(v_11 + J - w01_11) ;
+check[4] : '(v_pp + J - w11_pp) ;
+
+array( difference_n, 2) ;
+difference_n[1] : '(w11(1) - w10(1)) ;
+difference_n[2] : '(w11(1) - w01(1)) ;
+
+array( difference_p1, 2) ;
+difference_p1[1] : '(w01_p1 - w10_p1) ;
+difference_p1[2] : '(w01_p1 - w11_p1) ;
+
+array( difference_11, 2) ;
+difference_11[1] : '(w01_11 - w10_11) ;
+difference_11[2] : '(w01_11 - w11_11) ;
+
+array( difference_pp, 2) ;
+difference_pp[1] : '(w11_pp - w10_pp) ;
+difference_pp[2] : '(w11_pp - w01_pp) ;
+
+batchload("calculations") ;
+
+/*
+ vim: ft=maxima
+*/

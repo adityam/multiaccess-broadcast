@@ -1,0 +1,58 @@
+/* 
+ * calculate.mac 
+ * Aditya Mahajan <adityam@umich.edu>
+ *
+ * This file performs all the calculations required for verifying that the
+ * policy is optimal. 
+ */
+ 
+
+/* Define differential reward functions */
+
+w10(n) := r*p + v(n+1) ;
+w01(n) := r*Ap(n) + v(1) ;
+w11(n) := r*(p+Ap(n) - 2*p*Ap(n)) + p*Ap(n)*v_11 + (1 - p*Ap(n))*v_pp ; 
+
+w10_p1 : r*p + v(1) ;
+w01_p1 : r   + v(1) ;
+w11_p1 : r*(1+p-2*p) + p*v_11 + (1-p)*v_pp ;
+
+w10_11 : r + v_p1 ;
+w01_11 : r + v_p1 ;
+w11_11 : v_11 ;
+
+w10_pp : r*p + v(1) ;
+w01_pp : r*p + v(1) ;
+w11_pp : r*(2*p - 2*p^2) + p^2*v_11 + (1-p^2)*v_pp ;
+
+/* Show calculations */
+
+print("===============") ;
+print("value functions") ;
+print("===============") ;
+display(J,''v(n), v_11, v_pp, v_p1) ;
+
+print("==================") ;
+print("verify fixed point") ;
+print("==================") ;
+
+for i : 1 thru 4 do 
+  print("check ", i , ": ", 
+        check[i], " = ", ev(check[i], nouns, eval, eval, ratsimp)) ;
+
+print("==================") ;
+print("check differences ") ;
+print("==================") ;
+
+for DIFF in [difference_n, difference_p1, difference_11] do 
+  (print("::") ,
+  for i : 1 thru 2 do 
+    print(DIFF[i], " = " ,
+         factorsum(ev(DIFF[i], nouns, eval, eval, ratsimp)) ) 
+  ) ;
+
+
+
+/*
+  vim: ft=maxima
+*/
