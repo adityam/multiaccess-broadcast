@@ -2,19 +2,22 @@
 "***********************************************" ;
 /* The next step update functions for all cases */
 
-W10(n) := r*p + beta*V(n+1) ;
-W01(n) := r*Ap(n) + beta*V(1) ;
-W11(n) := r*(p+Ap(n) - 2*p*Ap(n)) + beta*p*Ap(n)*V_11 + beta*(1 - p*Ap(n))*V_pp ; 
+w10(n) := r*p + v(n+1) ;
+w01(n) := r*Ap(n) + v(1) ;
+w11(n) := r*(p+Ap(n) - 2*p*Ap(n)) + p*Ap(n)*v_11 + (1 - p*Ap(n))*v_pp ; 
 
-W10_p1 : r*p + beta*V(1) ;
-W01_p1 : r   + beta*V(1) ;
-W11_p1 : r*(1+p-2*p) + beta*p*V_11 + beta*(1-p)*V_pp ;
+w10_p1 : r*p + v(1) ;
+w01_p1 : r   + v(1) ;
+w11_p1 : r*(1+p-2*p) + p*v_11 + (1-p)*v_pp ;
 
-W10_11 : r + beta*V_p1 ;
-W01_11 : r + beta*V_p1 ;
-W11_11 : beta*V_11 ;
+w10_11 : r + v_p1 ;
+w01_11 : r + v_p1 ;
+w11_11 : v_11 ;
 
-W10_pp : r*p + beta*V(1) ;
-W01_pp : r*p + beta*V(1) ;
-W11_pp : r*(2*p - 2*p^2) + beta*p^2*V_11 + beta*(1-p^2)*V_pp ;
+w10_pp : r*p + v(1) ;
+w01_pp : r*p + v(1) ;
+w11_pp : r*(2*p - 2*p^2) + p^2*v_11 + (1-p^2)*v_pp ;
 
+/*
+  vim: ft=maxima
+*/
