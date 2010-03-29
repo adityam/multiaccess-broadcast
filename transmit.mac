@@ -1,0 +1,46 @@
+/* It is easier to work with (1-p) rather than p.  */
+p : 1-q ;
+Ap(n) := 1 - q^(n+1) ;
+
+"***********************************************" ;
+/* The reachable set of the state space is :
+   (1,1), (p,p), (1,p), (p,1), (p, A^n p), (A^n p, p)
+   we define a value function for each of these
+*/
+
+D : 1 + p^2 + p^3 ;
+J : r*p*(1+p)*(1+q^2)/D ;
+
+v(n) := r*(2*(1-q^n)*p^3 - (1-2*q^n)*p^2 + (4+q^n)*p - 1 + q^n )/D ;
+v_11 : 2*r ;
+v_pp : r*p*(3+p)/ D ;
+v_p1 : J + r ;
+
+/* Delta : r*(2*p^3 + p^2 -3*p+2)/D ; */
+/* DD : (2*r + (p + Ap(1) - 2*p*Ap(1))*r - 3*J)/(1 - p*Ap(1)) ; */
+
+batch("next-step") ;
+
+"***********************************************" ;
+/* Check that the value function is a fixed point */
+ratsimp(w11(1) - v(1) - J) ;
+ratsimp(w01_p1 - v_p1 - J) ;
+ratsimp(w01_11 - v_11 - J) ;
+ratsimp(w11_pp - v_pp - J) ;
+
+"***********************************************" ;
+/* Find differences w01 - w10 and w01 - w11 */
+factorsum(w11(1) - w10(1)) ;
+factorsum(w11(1) - w01(1)) ;
+
+"***********************************************" ;
+factorsum(w01_p1 - w10_p1) ;
+factorsum(w01_p1 - w11_p1) ;
+
+"***********************************************" ;
+factorsum(w01_11 - w10_11) ;
+factorsum(w01_11 - w11_11) ;
+
+"***********************************************" ;
+factorsum(w11_pp - w10_pp) ;
+factorsum(w11_pp - w01_pp) ;
