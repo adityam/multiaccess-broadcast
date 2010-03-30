@@ -44,12 +44,18 @@ print("==================") ;
 print("check differences ") ;
 print("==================") ;
 
-for DIFF in [difference_n, difference_p1, difference_11] do 
+for DIFF in [difference_n, difference_p1, difference_11, difference_pp] do 
   (print("::") ,
   for i : 1 thru 2 do 
-    print(DIFF[i], " = " ,
-         factorsum(ev(DIFF[i], nouns, eval, eval, ratsimp)) ) 
+    ( expression : factorsum(ev(DIFF[i], nouns, eval, eval, ratsimp)) ,
+      print(DIFF[i], " = " , expression) ,
+      if plotfigures then
+        (plot2d(ev(expression,r=1), range, [ylabel, sprint(DIFF[i])]),
+         read ("press a; to continue ...") 
+        )
+    ) 
   ) ;
+
 
 
 

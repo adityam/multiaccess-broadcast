@@ -1,39 +1,34 @@
 /* 
- * part1.mac
+ * part2.mac
  * Aditya Mahajan <adityam@umich.edu>
  *
  * This file verifies the form of the optimal policy for 
- * p < s_1
+ * s_1 < p < s_2
  */
 
 batchload("initialize.mac") ;
 
 /* Value functions */
 
-range : [q, 1-s_1, 1] ;
+range : [q, 1-s_2, 1-s_1] ;
 
-
-D : '(1 + p^2 + p^3) ;
-J : '(r*p*(1+p)*(1+q^2))/D ;
-
-v(n) := ev('(r*(2*(1-q^m)*p^3 - (1-2*q^m)*p^2 + (4+q^m)*p - 1 + q^m ))/D,
-          noeval, m=n);
-v_11 :  '(2*r) ;
-v_pp :  '(r*p*(3+p))/ D ;
-v_p1 :  '(J + r) ;
-
+J : '(r*(1-q^2)) ;
+v(n) := ev('(r*(1-q^(m+1))), noeval, m=n) ;
+v_p1 : 'r ;
+v_11 : '(r*(1+q^2)) ;
+v_pp : '(r*q^2) ;
 
 /* Value function update */
 array( check, 4) ;
-check[1] : '(v(1) + J - w11(1)) ;
+check[1] : '(v(1) + J - w01(1)) ;
 check[2] : '(v_p1 + J - w01_p1) ;
 check[3] : '(v_11 + J - w01_11) ;
 check[4] : '(v_pp + J - w11_pp) ;
 
 /* Value function optimality */
 array( difference_n, 2) ;
-difference_n[1] : '(w11(1) - w10(1)) ;
-difference_n[2] : '(w11(1) - w01(1)) ;
+difference_n[1] : '(w01(1) - w10(1)) ;
+difference_n[2] : '(w01(1) - w11(1)) ;
 
 array( difference_p1, 2) ;
 difference_p1[1] : '(w01_p1 - w10_p1) ;

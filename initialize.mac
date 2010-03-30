@@ -1,0 +1,21 @@
+/* 
+ * initialize.mac
+ * Aditya Mahajan <adityam@umich.edu>
+ *
+ * This file initializes constants for all three cases
+ */
+
+if not plotfigures then
+  plotfigures : false ; /* Set to true to view plots of the differences */
+
+
+/* Helper functions */
+p : 1-q ;                   /* It is easier to work with 1-p */
+Ap(n) := 1 - q^(n+1) ;
+
+s_1 : find_root(x^3 - 3*x +1, x,0,1);
+s_2 : find_root((1-x)^2 =x, x,0,1);
+
+/*
+ vim: ft=maxima
+*/
