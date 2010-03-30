@@ -1,0 +1,50 @@
+/* 
+ * part3.mac
+ * Aditya Mahajan <adityam@umich.edu>
+ *
+ * This file verifies the form of the optimal policy for 
+ * s_2 < p 
+ */
+
+batchload("initialize.mac") ;
+
+/* Value functions */
+
+range : [q, 0 , 1-s_2] ;
+
+J : '(r*(1-q^2)) ;
+v(n) := ev('(r*(1-q^(m+1))), noeval, m=n) ;
+v_p1 : 'r ;
+v_11 : '(r*(1+q^2)) ;
+v_pp : '(r*p) ;
+
+/* Value function update */
+array( check, 4) ;
+check[1] : '(v(1) + J - w01(1)) ;
+check[2] : '(v_p1 + J - w01_p1) ;
+check[3] : '(v_11 + J - w01_11) ;
+check[4] : '(v_pp + J - w01_pp) ;
+
+/* Value function optimality */
+array( difference_n, 2) ;
+difference_n[1] : '(w01(1) - w10(1)) ;
+difference_n[2] : '(w01(1) - w11(1)) ;
+
+array( difference_p1, 2) ;
+difference_p1[1] : '(w01_p1 - w10_p1) ;
+difference_p1[2] : '(w01_p1 - w11_p1) ;
+
+array( difference_11, 2) ;
+difference_11[1] : '(w01_11 - w10_11) ;
+difference_11[2] : '(w01_11 - w11_11) ;
+
+array( difference_pp, 2) ;
+difference_pp[1] : '(w01_pp - w10_pp) ;
+difference_pp[2] : '(w01_pp - w11_pp) ;
+
+/* Perform all the calculations */
+batchload("calculations.mac") ;
+
+/*
+ vim: ft=maxima
+*/
