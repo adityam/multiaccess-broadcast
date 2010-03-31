@@ -10,30 +10,51 @@ batchload("initialize.mac") ;
 
 /* Value functions */
 
-range : [q, 1-s_1, 1] ;
+kill(p) ;
+q : 1 - p ;
 
+m : 2 ;
+
+range : [p, s(m+1), s(m)] ;
+
+low : false ;
 
 D : '(1 + p^2 + p^3) ;
-J : '(r*p*(1+p)*(1+q^2))/D ;
+J : (r*p*(1-ratsimp(f(0))/D)) ;
 
-v(n) := ev('(r*(2*(1-q^m)*p^3 - (1-2*q^m)*p^2 + (4+q^m)*p - 1 + q^m ))/D,
-          noeval, m=n);
-v_11 :  '(2*r) ;
-v_pp :  '(r*p*(3+p))/ D ;
+vlow(n) := q*(1-q^n)*'J/p + r*q^(n+1) -r*q + 'v_pp ;
+vhigh(n) := r*Ap(n) + 'vlow(1) - 'J ;
+/*v(n) := if n <= m then vlow(n) else vhigh(n) ; */
+if low then
+  v(n) := vlow(n) 
+else 
+  v(n) := vhigh(n) ;
+
+v_11 :  2*r ;
+v_pp :  r*p*(3+p)/D ;
 v_p1 :  '(J + r) ;
 
 
 /* Value function update */
 array( check, 4) ;
-check[1] : '(v(1) + J - w11(1)) ;
+if low then
+  check[1] : '(v(n) + J - w11(n)) 
+else
+  check[1] : '(v(n) + J - w01(n)) ;
+
 check[2] : '(v_p1 + J - w01_p1) ;
 check[3] : '(v_11 + J - w01_11) ;
 check[4] : '(v_pp + J - w11_pp) ;
 
 /* Value function optimality */
 array( difference_n, 2) ;
-difference_n[1] : '(w11(1) - w10(1)) ;
-difference_n[2] : '(w11(1) - w01(1)) ;
+difference_n[1] : '(w01(n) - w10(n)) ;
+difference_n[2] : '(w01(n) - w11(n)) ;
+
+array( difference_1, 2) ;
+difference_1[1] : '(w11(n) - w01(n)) ;
+difference_1[2] : '(w11(n) - w10(n)) ;
+
 
 array( difference_p1, 2) ;
 difference_p1[1] : '(w01_p1 - w10_p1) ;
@@ -48,7 +69,7 @@ difference_pp[1] : '(w11_pp - w10_pp) ;
 difference_pp[2] : '(w11_pp - w01_pp) ;
 
 /* Perform all the calculations */
-batchload("calculations.mac") ;
+batchload("calculations-general.mac") ;
 
 /*
  vim: ft=maxima

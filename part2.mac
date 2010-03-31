@@ -3,14 +3,14 @@
  * Aditya Mahajan <adityam@umich.edu>
  *
  * This file verifies the form of the optimal policy for 
- * s_1 < p < s_2
+ * s(1) < p < tau
  */
 
 batchload("initialize.mac") ;
 
 /* Value functions */
 
-range : [q, 1-s_2, 1-s_1] ;
+range : [q, 1-tau, 1-s(1)] ;
 
 J : '(r*(1-q^2)) ;
 v(n) := ev('(r*(1-q^(m+1))), noeval, m=n) ;
@@ -20,15 +20,19 @@ v_pp : '(r*q^2) ;
 
 /* Value function update */
 array( check, 4) ;
-check[1] : '(v(1) + J - w01(1)) ;
+check[1] : '(v(n) + J - w01(n)) ;
 check[2] : '(v_p1 + J - w01_p1) ;
 check[3] : '(v_11 + J - w01_11) ;
 check[4] : '(v_pp + J - w11_pp) ;
 
 /* Value function optimality */
 array( difference_n, 2) ;
-difference_n[1] : '(w01(1) - w10(1)) ;
-difference_n[2] : '(w01(1) - w11(1)) ;
+difference_n[1] : '(w01(n) - w10(n)) ;
+difference_n[2] : '(w01(n) - w11(n)) ;
+
+array( difference_1, 2) ;
+difference_1[1] : ev(difference_n[1], noeval, n=1) ;
+difference_1[2] : ev(difference_n[2], noeval, n=1) ;
 
 array( difference_p1, 2) ;
 difference_p1[1] : '(w01_p1 - w10_p1) ;
