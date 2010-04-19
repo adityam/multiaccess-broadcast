@@ -12,9 +12,9 @@ if not plotfigures then
 /* Helper functions */
 p : 1-q ;                   /* It is easier to work with 1-p */
 Ap(n) := 1 - q^(n+1) ;
-f(n) := 1 + (1-p)^2 - (3 +p)*(1-p)^(n+1) ;
+f(n,x) := 1 + (1-x)^2 - (3 +x)*(1-x)^(n+1) ;
 
-s(n) := find_root(f(n), p,0,1);
+s(n) := find_root(f(n,x), x,0,1);
 tau  : find_root((1-x)^2 =x, x,0,1);
 
 /*
