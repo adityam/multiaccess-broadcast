@@ -1,0 +1,172 @@
+% Two-user multiple access broadcast
+% Aditya Mahajan
+% April 20, 2010
+
+This is `maxima` source code to verify the calculations presented in the
+appendix of
+
+> Aditya Mahajan, “Optimal decentralized transmission policies for two-user
+> multiple access broadcast”, in Proceedings of the 2010 conference on decision
+> and control (CDC).
+
+Preliminaries
+=============
+
+In Proposition 1, we define a transformation $A_i$.
+Since we are only concerned with symmetric arrival rates, we only need to work
+with
+
+    Ap(n) := 1 - (1-p)^(n+1);
+
+In Definition 3, a function $f_n(x)$ is defined as:
+
+    f(n,x) := 1 + (1-x)^n - (3+x)*(1-x)^(n+1) ;
+
+$s_n$ denotes the root of $f_n(x)$ that is between $[0,1]$. Thus,
+
+    s(n) := find_root( f(n,x), x, 0, 1 )$
+
+$τ$ is the root of $x = (1-x)^2$ that lies in $[0,1]$. Thus,
+
+    tau : find_root( (1-x)^2 = x, x, 0, 1 )$
+
+    display(tau)$
+
+$$
+\tau=.3819660112501052
+$$
+
+Dynamic program
+===============
+
+Although the reachable state space is countable, the value function can be
+written succiently. We use different variable names for each form of the value
+function:
+
+* $v(p, A^n p)$ = `v(n)`
+* $v(p,1)$ = `v_p1`
+* $v(1,1)$ = `v_11`
+* $v(p,p)$ = `v_pp`
+
+For reason that will become apparent later, we use `v_init` for the
+value of `v(1)`.
+
+Similar to the value function, the differential reward function has four forms.
+
+* $w_{01}(p,A^n p)$ = `w01(n)`
+* $w_{01}(p,1)$ = `w01_p1`
+* $w_{01}(1,1)$ = `w01_11`
+* $w_{01}(p,p)$ = `w01_pp`
+
+These differential rewards are given by
+
+    w01(n) := r*Ap(n) + v_init    $
+    w01_p1 :  r       + v_init    $
+    w01_11 :  r       + v_p1      $
+    w01_pp :  r*p     + v_init    $
+
+
+Similar interpretations hold  for $w_{10}$
+
+    w10(n) := r*p + v(n+1)    $
+    w10_p1 :  r*p + v_init    $
+    w10_11 :  r   + v_p1      $
+    w10_pp :  r*p + v_init    $
+
+
+and $w_{11}$
+
+    w11(n) := r*(p + Ap(n) - 2*p*Ap(n)) + p*Ap(n)*v_11 + 
+              (1-p*Ap(n))*v_pp                           $
+    w11_p1 :  r*(1+p-2*p) + p*v_11 + (1-p)*v_pp          $
+    w11_11 :  v_11                                       $
+    w11_pp :  r*(2*p - 2*p^2) + p^2*v_11 + (1-p^2)*v_pp  $
+
+Case 1 : $p ≥ τ$
+================
+
+For this case, we find it more convinient to work with $1-p$ rather than $p$.
+So,
+
+    kill(p) $
+    p : 1-q $
+
+
+We claim that
+
+    J    :  r*(1-q^2)       $
+    v(n) := r*(1-q^(n+1))   $
+    v_p1 :  r               $
+    v_11 :  r*(1+q^2)       $
+    v_pp :  r*p             $
+
+    v_init : v(1)           $
+
+    print("value functions")$ display(J, v(n), v_11, v_pp, v_p1)$
+
+\bold{value functions}
+$$\eqalign{
+  J      &= ( 1-{q}^{2})\,r   \crcr
+  v(n)   &= ( 1-{q}^{n+1})\,r \crcr
+  v_{11} &= ( {q}^{2}+1 ) \,r \crcr
+  v_{pp} &= {q}^{2}\,r        \crcr
+  v_{p1} &= r                 \crcr}
+$$
+
+
+To verify these statements, we need to check two things. We first define a
+helper function to display the output
+
+    show(label, arr, size) := for i : 1 thru size do
+        print(label, i, ":",
+          arr[i], " = ", ev(arr[i], nouns, eval, eval, ratsimp)) $
+
+    show_diff(label, arr1, arr2, size) := for i : 1 thru size do
+        print(label, i, ":",
+          arr1[i], " - ", arr2[i], " = ", 
+          ev(arr1[i] - arr2[i], nouns, eval, eval, ratsimp)) $
+
+    array(check, 4) $
+    array(diff,  2) $       
+    array(value, 2) $
+
+First, we have to verify fixed point equations:
+
+    check[1] : '(v(n) + J - w01(n)) $
+    check[2] : '(v_p1 + J - w01_p1) $
+    check[3] : '(v_11 + J - w01_11) $
+    check[4] : '(v_pp + J - w01_pp) $
+
+    show("check", check,4)          $
+
+Second, we have to verify that the chosen action gives a larger reward than
+other actions. We treat the four cases separately:
+
+For $(π_1, π_2) = (p, A^n p)$, we have
+
+    diff[1] : '(w01(n) - w10(n)) $ value[1] : '(r*p*q*(1-q^n))            $
+    diff[2] : '(w01(n) - w11(n)) $ value[2] : '(r*p^2*(1+q*(1-(2+q)*q^n)))$
+
+    show_diff("diff(n)", diff, value, 2) $
+
+For $(π_1, π_2) = (p,1)$, we have
+
+    diff[1] : '(w01_p1 - w10_p1)  $  value[1] : r*q         $
+    diff[2] : '(w01_p1 - w11_p1)  $  value[2] : r*p^2*(1+q) $
+
+    show_diff("diff_p1", diff, value, 2) $
+
+For $(π_1, π_2) = (1,1)$, we have
+
+    diff[1] : '(w01_11 - w10_11)  $  value[1] : 0         $
+    diff[2] : '(w01_11 - w11_11)  $  value[2] : r*p*(1+q) $
+
+    show_diff("diff_11", diff, value, 2) $
+
+For $(π_1, π_2) = (p,p)$, we have
+
+    diff[1] : '(w01_pp - w10_pp)  $  value[1] : 0             $
+    diff[2] : '(w01_pp - w11_pp)  $  value[2] : r*p^2*(p-q^2) $
+
+    show_diff("diff_pp", diff, value, 2) $
+

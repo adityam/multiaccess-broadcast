@@ -30,9 +30,9 @@ if low then
 else 
   v(n) := vhigh(n) ;
 
-v_11 :  2*r ;
-v_pp :  r*p*(3+p)/D ;
-v_p1 :  '(J + r) ;
+v_11 :  r ;
+v_pp :  r*f(1)/D ;
+v_p1 :  'J  ;
 
 
 /* Value function update */
