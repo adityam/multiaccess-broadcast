@@ -20,7 +20,7 @@ with
 
 In Definition 3, a function $f_n(x)$ is defined as:
 
-    f(n,x) := 1 + (1-x)^n - (3+x)*(1-x)^(n+1) ;
+    f(n,x) := 1 + (1-x)^2 - (3+x)*(1-x)^(n+1) ;
 
 $s_n$ denotes the root of $f_n(x)$ that is between $[0,1]$. Thus,
 
@@ -60,30 +60,32 @@ Similar to the value function, the differential reward function has four forms.
 
 These differential rewards are given by
 
-    w01(n) := r*Ap(n) + v_init    $
-    w01_p1 :  r       + v_init    $
-    w01_11 :  r       + v_p1      $
-    w01_pp :  r*p     + v_init    $
+    w01(n) := r*Ap(n) + 'v_init    $
+    w01_p1 :  r       + 'v_init    $
+    w01_11 :  r       + 'v_p1      $
+    w01_pp :  r*p     + 'v_init    $
 
 
 Similar interpretations hold  for $w_{10}$
 
-    w10(n) := r*p + v(n+1)    $
-    w10_p1 :  r*p + v_init    $
-    w10_11 :  r   + v_p1      $
-    w10_pp :  r*p + v_init    $
+    w10(n) := r*p + 'v(n+1)    $
+    w10_p1 :  r*p + 'v_init    $
+    w10_11 :  r   + 'v_p1      $
+    w10_pp :  r*p + 'v_init    $
 
 
 and $w_{11}$
 
-    w11(n) := r*(p + Ap(n) - 2*p*Ap(n)) + p*Ap(n)*v_11 + 
-              (1-p*Ap(n))*v_pp                           $
-    w11_p1 :  r*(1+p-2*p) + p*v_11 + (1-p)*v_pp          $
-    w11_11 :  v_11                                       $
-    w11_pp :  r*(2*p - 2*p^2) + p^2*v_11 + (1-p^2)*v_pp  $
+    w11(n) := r*(p + Ap(n) - 2*p*Ap(n)) + p*Ap(n)*'v_11 + 
+              (1-p*Ap(n))*'v_pp                           $
+    w11_p1 :  r*(1+p-2*p) + p*'v_11 + (1-p)*'v_pp          $
+    w11_11 :  'v_11                                       $
+    w11_pp :  r*(2*p - 2*p^2) + p^2*'v_11 + (1-p^2)*'v_pp  $
 
 Case 1 : $p ≥ τ$
 ================
+
+    print("Case 1: p ≥ τ")$ print("--------------") $
 
 For this case, we find it more convinient to work with $1-p$ rather than $p$.
 So,
@@ -114,7 +116,7 @@ $$\eqalign{
 $$
 
 
-To verify these statements, we need to check two things. We first define a
+To verify the optimal policy, we need to check two things. We first define a
 helper function to display the output
 
     show(label, arr, size) := for i : 1 thru size do
@@ -167,6 +169,63 @@ For $(π_1, π_2) = (p,p)$, we have
 
     diff[1] : '(w01_pp - w10_pp)  $  value[1] : 0             $
     diff[2] : '(w01_pp - w11_pp)  $  value[2] : r*p^2*(p-q^2) $
+
+    show_diff("diff_pp", diff, value, 2) $
+
+Case 2 : $s_1 ≤ p < τ$
+=======================
+
+    print("Case 2: s_1 ≤ p < τ")$ print("------------------") $
+
+As before, it is more convinient to work with $1-p$ rather than $p$.
+So,
+
+    kill(p) $
+    p : 1-q $
+
+In this case, only the value function for $v(p,p)$ changes. The rest are the
+same as before
+
+    v_pp :  r*q^2 $
+
+    print("value functions")$ display(J, v(n), v_11, v_pp, v_p1)$
+
+To verify the optimal policy, we need to check two things. First, we  verify
+the fixed point equations. The first three equations remain as before, so we
+only modify the fourth check equation. 
+
+    check[4] : '(v_pp + J - w11_pp) $
+
+    show("check", check,4)          $
+
+Second, we have to verify that the chosen action gives a larger reward than
+other actions. We treat the four cases separately:
+
+For $(π_1, π_2) = (p, A^n p)$, we have
+
+    diff[1] : '(w01(n) - w10(n)) $ value[1] : '(r*p*q*(1-q^n))                $
+    diff[2] : '(w01(n) - w11(n)) $ value[2] : r* '(f(n,p) - 3*q^2*(1-q^(n-1)))$
+
+    show_diff("diff(n)", diff, value, 2) $
+
+For $(π_1, π_2) = (p,1)$, we have
+
+    diff[1] : '(w01_p1 - w10_p1)  $  value[1] : r*q        $
+    diff[2] : '(w01_p1 - w11_p1)  $  value[2] : -r*f(0,q)  $
+
+    show_diff("diff_p1", diff, value, 2) $
+
+For $(π_1, π_2) = (1,1)$, we have
+
+    diff[1] : '(w01_11 - w10_11)  $  value[1] : 0         $
+    diff[2] : '(w01_11 - w11_11)  $  value[2] : r*p*(1+q) $
+
+    show_diff("diff_11", diff, value, 2) $
+
+For $(π_1, π_2) = (p,p)$, we have
+
+    diff[1] : '(w11_pp - w10_pp)  $  value[1] : r*(q^2 - p) $
+    diff[2] : '(w11_pp - w01_pp)  $  value[2] : r*(q^2 - p) $
 
     show_diff("diff_pp", diff, value, 2) $
 
