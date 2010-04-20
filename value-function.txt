@@ -93,7 +93,7 @@ calculations.
         print(label, i, ":",
           arr1[i], 
           if ev(arr1[i] - arr2[i], nouns, eval, eval, ratsimp) = 0 
-            then "=" else "error(!=)" , 
+            then "=" else error(arr1[i], "!=", arr2[i]) , 
            arr2[i]) 
     $
 
@@ -227,22 +227,122 @@ For $(π_1, π_2) = (p, A^n p)$, we have
 
 For $(π_1, π_2) = (p,1)$, we have
 
-    diff[1] : '(w01_p1 - w10_p1)  $  value[1] : r*q        $
-    diff[2] : '(w01_p1 - w11_p1)  $  value[2] : -r*f(0,q)  $
+    diff[1] : '(w01_p1 - w10_p1)  $
+    diff[2] : '(w01_p1 - w11_p1)  $  
+
+    value[1] : r*q        $
+    value[2] : -r*f(0,q)  $
 
     show_diff("diff_p1", diff, value, 2) $
 
 For $(π_1, π_2) = (1,1)$, we have
 
-    diff[1] : '(w01_11 - w10_11)  $  value[1] : 0         $
-    diff[2] : '(w01_11 - w11_11)  $  value[2] : r*p*(1+q) $
+    diff[1] : '(w01_11 - w10_11)  $
+    diff[2] : '(w01_11 - w11_11)  $
+
+    value[1] : 0         $
+    value[2] : r*p*(1+q) $
 
     show_diff("diff_11", diff, value, 2) $
 
 For $(π_1, π_2) = (p,p)$, we have
 
-    diff[1] : '(w11_pp - w10_pp)  $  value[1] : r*(q^2 - p) $
-    diff[2] : '(w11_pp - w01_pp)  $  value[2] : r*(q^2 - p) $
+    diff[1] : '(w11_pp - w10_pp)  $
+    diff[2] : '(w11_pp - w01_pp)  $
+
+    value[1] : r*(q^2 - p) $
+    value[2] : r*(q^2 - p) $
 
     show_diff("diff_pp", diff, value, 2) $
 
+Case 3 : $s_{m+1} ≤ p < s_m$
+=============================
+
+    print("Case 3: s_(m+1) ≤ p < s_m")$ print("------------------") $
+
+In this case, it is more convinient to work with $p$ rather than $1-p$.
+So,
+
+    kill(p) $
+    q : 1-p $
+
+In many ways, this is the most difficult case. Part of the difficulty arises
+from the fact that the form of the value functions are more complicated. 
+
+
+    D : 1 + p^2 + p^3             $
+    J : r*p*(1-ratsimp(f(0,p))/D) $
+
+    v_p1 : J            $
+    v_11 : r            $
+    v_pp : r*f(1,p)/D   $
+
+    c_low(n)  := q*(1-q^n)*J/p + r*q^(n+1) - r*q + v_pp $
+    c_high(n) := r*(1-q^(n+1)) + c_low(1) - J           $
+
+    v_init : c_low(1) $ 
+
+As before, to verify the optimal policy, we need to check two things. First, we
+verify the fixed point equations. 
+
+    kill (check)  $ array(check, 5) $
+
+    check[1] : '(c_low(n) + J - w11(n))  $
+    check[2] : '(c_high(n) + J - w01(n)) $
+    check[3] : '(v_p1 + J - w01_p1) $
+    check[4] : '(v_11 + J - w01_11) $
+    check[5] : '(v_pp + J - w11_pp) $
+
+    show("check", check,5)          $
+
+For $(π_1, π_2) = (p, A^n p)$, and $n ≤ m$, we have
+
+    v(n) := c_low(n)  $
+    diff[1] : '(w11(n) - w10(n)) $ 
+    diff[2] : '(w11(n) - w01(n)) $
+
+    value[1] : -r*p*(1-q^(n+1))*'f(0,p)/D   $
+    value[2] : -r*p^2*f(n,p)/D              $
+
+    show_diff("diff(n)", diff, value, 2) $
+
+For $(π_1, π_2) = (p, A^n p)$, and $n > m$, we have
+
+    v(n) := c_high(n)  $
+    diff[1] : '(w01(n) - w10(n)) $ 
+    diff[2] : '(w01(n) - w11(n)) $
+
+    value[1] : r*p*(- f(0,p)/D - q^(n+1))   $
+    value[2] : r*p^2*f(n,p)/D               $
+
+    show_diff("diff(n)", diff, value, 2) $
+
+For $(π_1, π_2) = (p,1)$, we have
+
+    diff[1] : '(w01_p1 - w10_p1)  $
+    diff[2] : '(w01_p1 - w11_p1)  $  
+
+    value[1] : r*q        $
+    value[2] : r*p^2*(1+q^2)/D    $
+
+    show_diff("diff_p1", diff, value, 2) $
+
+For $(π_1, π_2) = (1,1)$, we have
+
+    diff[1] : '(w01_11 - w10_11)  $
+    diff[2] : '(w01_11 - w11_11)  $
+
+    value[1] : 0                   $
+    value[2] : r*p*(1+p)*(1+q^2)/D $
+
+    show_diff("diff_11", diff, value, 2) $
+
+For $(π_1, π_2) = (p,p)$, we have
+
+    diff[1] : '(w11_pp - w10_pp)  $
+    diff[2] : '(w11_pp - w01_pp)  $
+
+    value[1] : r*p^2*(1-2*p^2)/D  $
+    value[2] : r*p^2*(1-2*p^2)/D  $
+
+    show_diff("diff_pp", diff, value, 2) $
