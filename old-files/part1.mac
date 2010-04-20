@@ -17,7 +17,7 @@ m : 2 ;
 
 range : [p, s(m+1), s(m)] ;
 
-low : false ;
+low : true ;
 
 D : '(1 + p^2 + p^3) ;
 J : (r*p*(1-ratsimp(f(0,p))/D)) ;
