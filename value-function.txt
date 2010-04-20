@@ -109,7 +109,7 @@ Case 1 : $p ≥ τ$
 
     print("")                 $
     print("----------------") $
-    print("\f Case 1: p ≥ τ") $
+    print("   Case 1: p ≥ τ") $
     print("----------------") $
 
 For this case, we find it more convinient to work with $1-p$ rather than $p$.
