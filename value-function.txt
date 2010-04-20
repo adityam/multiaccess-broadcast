@@ -82,6 +82,26 @@ and $w_{11}$
     w11_11 :  'v_11                                       $
     w11_pp :  r*(2*p - 2*p^2) + p^2*'v_11 + (1-p^2)*'v_pp  $
 
+We need a few helper functions to display the results of intermediate
+calculations.
+
+    show(label, arr, size) := for i : 1 thru size do
+        print(label, i, ":",
+          arr[i], " = ", ev(arr[i], nouns, eval, eval, ratsimp)) $
+
+    show_diff(label, arr1, arr2, size) := for i : 1 thru size do
+        print(label, i, ":",
+          arr1[i], 
+          if ev(arr1[i] - arr2[i], nouns, eval, eval, ratsimp) = 0 
+            then "=" else "error(!=)" , 
+           arr2[i]) 
+    $
+
+    array(check, 4) $
+    array(diff,  2) $       
+    array(value, 2) $
+
+
 Case 1 : $p ≥ τ$
 ================
 
@@ -116,23 +136,8 @@ $$\eqalign{
 $$
 
 
-To verify the optimal policy, we need to check two things. We first define a
-helper function to display the output
-
-    show(label, arr, size) := for i : 1 thru size do
-        print(label, i, ":",
-          arr[i], " = ", ev(arr[i], nouns, eval, eval, ratsimp)) $
-
-    show_diff(label, arr1, arr2, size) := for i : 1 thru size do
-        print(label, i, ":",
-          arr1[i], " - ", arr2[i], " = ", 
-          ev(arr1[i] - arr2[i], nouns, eval, eval, ratsimp)) $
-
-    array(check, 4) $
-    array(diff,  2) $       
-    array(value, 2) $
-
-First, we have to verify fixed point equations:
+To verify the optimal policy, we need to check two things. First, we have to
+verify fixed point equations:
 
     check[1] : '(v(n) + J - w01(n)) $
     check[2] : '(v_p1 + J - w01_p1) $
@@ -146,15 +151,21 @@ other actions. We treat the four cases separately:
 
 For $(π_1, π_2) = (p, A^n p)$, we have
 
-    diff[1] : '(w01(n) - w10(n)) $ value[1] : '(r*p*q*(1-q^n))            $
-    diff[2] : '(w01(n) - w11(n)) $ value[2] : '(r*p^2*(1+q*(1-(2+q)*q^n)))$
+    diff[1] : '(w01(n) - w10(n)) $ 
+    diff[2] : '(w01(n) - w11(n)) $
+
+    value[1] : '(r*p*q*(1-q^n))            $
+    value[2] : '(r*p^2*(1+q*(1-(2+q)*q^n)))$
 
     show_diff("diff(n)", diff, value, 2) $
 
 For $(π_1, π_2) = (p,1)$, we have
 
-    diff[1] : '(w01_p1 - w10_p1)  $  value[1] : r*q         $
-    diff[2] : '(w01_p1 - w11_p1)  $  value[2] : r*p^2*(1+q) $
+    diff[1] : '(w01_p1 - w10_p1)  $
+    diff[2] : '(w01_p1 - w11_p1)  $
+
+    value[1] : r*q         $
+    value[2] : r*p^2*(1+q) $
 
     show_diff("diff_p1", diff, value, 2) $
 
@@ -167,8 +178,11 @@ For $(π_1, π_2) = (1,1)$, we have
 
 For $(π_1, π_2) = (p,p)$, we have
 
-    diff[1] : '(w01_pp - w10_pp)  $  value[1] : 0             $
-    diff[2] : '(w01_pp - w11_pp)  $  value[2] : r*p^2*(p-q^2) $
+    diff[1] : '(w01_pp - w10_pp)  $
+    diff[2] : '(w01_pp - w11_pp)  $  
+
+    value[1] : 0             $
+    value[2] : r*p^2*(p-q^2) $
 
     show_diff("diff_pp", diff, value, 2) $
 
@@ -203,8 +217,11 @@ other actions. We treat the four cases separately:
 
 For $(π_1, π_2) = (p, A^n p)$, we have
 
-    diff[1] : '(w01(n) - w10(n)) $ value[1] : '(r*p*q*(1-q^n))                $
-    diff[2] : '(w01(n) - w11(n)) $ value[2] : r* '(f(n,p) - 3*q^2*(1-q^(n-1)))$
+    diff[1] : '(w01(n) - w10(n)) $ 
+    diff[2] : '(w01(n) - w11(n)) $
+
+    value[1] : '(r*p*q*(1-q^n))  $
+    value[2] : r* '(f(n,p) - 3*q^2*(1-q^(n-1)))$
 
     show_diff("diff(n)", diff, value, 2) $
 
