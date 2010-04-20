@@ -1,5 +1,6 @@
-This is \type{maxima} source code to verify the calculations
-presented in the appendix of
+This is
+\useURL[1][http://maxima.sourceforge.net/][][maxima]\from[1] source
+code to verify the calculations presented in the appendix of
 
 \startblockquote
 Aditya Mahajan,
@@ -128,7 +129,10 @@ array(value, 2) $
 \subject{Case 1 : $p ≥ τ$}
 
 \starttyping
-print("Case 1: p ≥ τ")$ print("--------------") $
+print("")                 $
+print("----------------") $
+print("   Case 1: p ≥ τ") $
+print("----------------") $
 \stoptyping
 
 For this case, we find it more convinient to work with $1-p$ rather
@@ -177,9 +181,11 @@ show("check", check,4)          $
 Second, we have to verify that the chosen action gives a larger
 reward than other actions. We treat the four cases separately:
 
-For $(π_1, π_2) = (p, A^n p)$, we have
-
-\starttyping
+\startitemize[n][stopper=.]
+\item
+  For $(π_1, π_2) = (p, A^n p)$, we have
+  
+  \starttyping
 diff[1] : '(w01(n) - w10(n)) $ 
 diff[2] : '(w01(n) - w11(n)) $
 
@@ -189,9 +195,10 @@ value[2] : '(r*p^2*(1+q*(1-(2+q)*q^n)))$
 show_diff("diff(n)", diff, value, 2) $
 \stoptyping
 
-For $(π_1, π_2) = (p,1)$, we have
-
-\starttyping
+\item
+  For $(π_1, π_2) = (p,1)$, we have
+  
+  \starttyping
 diff[1] : '(w01_p1 - w10_p1)  $
 diff[2] : '(w01_p1 - w11_p1)  $
 
@@ -201,18 +208,20 @@ value[2] : r*p^2*(1+q) $
 show_diff("diff_p1", diff, value, 2) $
 \stoptyping
 
-For $(π_1, π_2) = (1,1)$, we have
-
-\starttyping
+\item
+  For $(π_1, π_2) = (1,1)$, we have
+  
+  \starttyping
 diff[1] : '(w01_11 - w10_11)  $  value[1] : 0         $
 diff[2] : '(w01_11 - w11_11)  $  value[2] : r*p*(1+q) $
 
 show_diff("diff_11", diff, value, 2) $
 \stoptyping
 
-For $(π_1, π_2) = (p,p)$, we have
-
-\starttyping
+\item
+  For $(π_1, π_2) = (p,p)$, we have
+  
+  \starttyping
 diff[1] : '(w01_pp - w10_pp)  $
 diff[2] : '(w01_pp - w11_pp)  $  
 
@@ -222,10 +231,15 @@ value[2] : r*p^2*(p-q^2) $
 show_diff("diff_pp", diff, value, 2) $
 \stoptyping
 
+\stopitemize
+
 \subject{Case 2 : $s_1 ≤ p < τ$}
 
 \starttyping
-print("Case 2: s_1 ≤ p < τ")$ print("------------------") $
+print("")                    $
+print("-------------------") $
+print("Case 2: s_1 ≤ p < τ") $
+print("-------------------") $
 \stoptyping
 
 As before, it is more convinient to work with $1-p$ rather than
@@ -258,9 +272,11 @@ show("check", check,4)          $
 Second, we have to verify that the chosen action gives a larger
 reward than other actions. We treat the four cases separately:
 
-For $(π_1, π_2) = (p, A^n p)$, we have
-
-\starttyping
+\startitemize[n][stopper=.]
+\item
+  For $(π_1, π_2) = (p, A^n p)$, we have
+  
+  \starttyping
 diff[1] : '(w01(n) - w10(n)) $ 
 diff[2] : '(w01(n) - w11(n)) $
 
@@ -270,9 +286,10 @@ value[2] : r* '(f(n,p) - 3*q^2*(1-q^(n-1)))$
 show_diff("diff(n)", diff, value, 2) $
 \stoptyping
 
-For $(π_1, π_2) = (p,1)$, we have
-
-\starttyping
+\item
+  For $(π_1, π_2) = (p,1)$, we have
+  
+  \starttyping
 diff[1] : '(w01_p1 - w10_p1)  $
 diff[2] : '(w01_p1 - w11_p1)  $  
 
@@ -282,9 +299,10 @@ value[2] : -r*f(0,q)  $
 show_diff("diff_p1", diff, value, 2) $
 \stoptyping
 
-For $(π_1, π_2) = (1,1)$, we have
-
-\starttyping
+\item
+  For $(π_1, π_2) = (1,1)$, we have
+  
+  \starttyping
 diff[1] : '(w01_11 - w10_11)  $
 diff[2] : '(w01_11 - w11_11)  $
 
@@ -294,9 +312,10 @@ value[2] : r*p*(1+q) $
 show_diff("diff_11", diff, value, 2) $
 \stoptyping
 
-For $(π_1, π_2) = (p,p)$, we have
-
-\starttyping
+\item
+  For $(π_1, π_2) = (p,p)$, we have
+  
+  \starttyping
 diff[1] : '(w11_pp - w10_pp)  $
 diff[2] : '(w11_pp - w01_pp)  $
 
@@ -306,10 +325,15 @@ value[2] : r*(q^2 - p) $
 show_diff("diff_pp", diff, value, 2) $
 \stoptyping
 
+\stopitemize
+
 \subject{Case 3 : $s_{m+1} ≤ p < s_m$}
 
 \starttyping
-print("Case 3: s_(m+1) ≤ p < s_m")$ print("------------------") $
+print("")                          $
+print("-------------------------") $
+print("Case 3: s_(m+1) ≤ p < s_m") $
+print("-------------------------") $
 \stoptyping
 
 In this case, it is more convinient to work with $p$ rather than
@@ -353,9 +377,15 @@ check[5] : '(v_pp + J - w11_pp) $
 show("check", check,5)          $
 \stoptyping
 
-For $(π_1, π_2) = (p, A^n p)$, and $n ≤ m$, we have
-
-\starttyping
+\startitemize[n][stopper=.]
+\item
+  For $(π_1, π_2) = (p, A^n p)$,
+  
+  \startitemize[a][stopper=)]
+  \item
+    for $n ≤ m$, we have
+    
+    \starttyping
 v(n) := c_low(n)  $
 diff[1] : '(w11(n) - w10(n)) $ 
 diff[2] : '(w11(n) - w01(n)) $
@@ -366,9 +396,10 @@ value[2] : -r*p^2*f(n,p)/D              $
 show_diff("diff(n)", diff, value, 2) $
 \stoptyping
 
-For $(π_1, π_2) = (p, A^n p)$, and $n > m$, we have
-
-\starttyping
+  \item
+    for $n > m$, we have
+    
+    \starttyping
 v(n) := c_high(n)  $
 diff[1] : '(w01(n) - w10(n)) $ 
 diff[2] : '(w01(n) - w11(n)) $
@@ -379,9 +410,11 @@ value[2] : r*p^2*f(n,p)/D               $
 show_diff("diff(n)", diff, value, 2) $
 \stoptyping
 
-For $(π_1, π_2) = (p,1)$, we have
-
-\starttyping
+  \stopitemize
+\item
+  For $(π_1, π_2) = (p,1)$, we have
+  
+  \starttyping
 diff[1] : '(w01_p1 - w10_p1)  $
 diff[2] : '(w01_p1 - w11_p1)  $  
 
@@ -391,9 +424,10 @@ value[2] : r*p^2*(1+q^2)/D    $
 show_diff("diff_p1", diff, value, 2) $
 \stoptyping
 
-For $(π_1, π_2) = (1,1)$, we have
-
-\starttyping
+\item
+  For $(π_1, π_2) = (1,1)$, we have
+  
+  \starttyping
 diff[1] : '(w01_11 - w10_11)  $
 diff[2] : '(w01_11 - w11_11)  $
 
@@ -403,9 +437,10 @@ value[2] : r*p*(1+p)*(1+q^2)/D $
 show_diff("diff_11", diff, value, 2) $
 \stoptyping
 
-For $(π_1, π_2) = (p,p)$, we have
-
-\starttyping
+\item
+  For $(π_1, π_2) = (p,p)$, we have
+  
+  \starttyping
 diff[1] : '(w11_pp - w10_pp)  $
 diff[2] : '(w11_pp - w01_pp)  $
 
@@ -415,3 +450,4 @@ value[2] : r*p^2*(1-2*p^2)/D  $
 show_diff("diff_pp", diff, value, 2) $
 \stoptyping
 
+\stopitemize

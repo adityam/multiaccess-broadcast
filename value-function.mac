@@ -14,9 +14,9 @@ w10_11 :  r   + 'v_p1      $
 w10_pp :  r*p + 'v_init    $
 w11(n) := r*(p + Ap(n) - 2*p*Ap(n)) + p*Ap(n)*'v_11 + 
           (1-p*Ap(n))*'v_pp                           $
-w11_p1 :  r*(1+p-2*p) + p*'v_11 + (1-p)*'v_pp          $
+w11_p1 :  r*(1+p-2*p) + p*'v_11 + (1-p)*'v_pp         $
 w11_11 :  'v_11                                       $
-w11_pp :  r*(2*p - 2*p^2) + p^2*'v_11 + (1-p^2)*'v_pp  $
+w11_pp :  r*(2*p - 2*p^2) + p^2*'v_11 + (1-p^2)*'v_pp $
 show(label, arr, size) := for i : 1 thru size do
     print(label, i, ":",
       arr[i], " = ", ev(arr[i], nouns, eval, eval, ratsimp)) $
@@ -32,7 +32,10 @@ $
 array(check, 4) $
 array(diff,  2) $       
 array(value, 2) $
-print("Case 1: p ≥ τ")$ print("--------------") $
+print("")                 $
+print("----------------") $
+print("   Case 1: p ≥ τ") $
+print("----------------") $
 kill(p) $
 p : 1-q $
 J    :  r*(1-q^2)       $
@@ -75,7 +78,10 @@ value[1] : 0             $
 value[2] : r*p^2*(p-q^2) $
 
 show_diff("diff_pp", diff, value, 2) $
-print("Case 2: s_1 ≤ p < τ")$ print("------------------") $
+print("")                    $
+print("-------------------") $
+print("Case 2: s_1 ≤ p < τ") $
+print("-------------------") $
 kill(p) $
 p : 1-q $
 v_pp :  r*q^2 $
@@ -112,7 +118,10 @@ value[1] : r*(q^2 - p) $
 value[2] : r*(q^2 - p) $
 
 show_diff("diff_pp", diff, value, 2) $
-print("Case 3: s_(m+1) ≤ p < s_m")$ print("------------------") $
+print("")                          $
+print("-------------------------") $
+print("Case 3: s_(m+1) ≤ p < s_m") $
+print("-------------------------") $
 kill(p) $
 q : 1-p $
 D : 1 + p^2 + p^3             $
