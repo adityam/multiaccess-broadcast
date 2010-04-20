@@ -1,0 +1,417 @@
+This is \type{maxima} source code to verify the calculations
+presented in the appendix of
+
+\startblockquote
+Aditya Mahajan,
+\quotation{Optimal decentralized transmission policies for two-user multiple access broadcast},
+in Proceedings of the 2010 conference on decision and control
+(CDC).
+\stopblockquote
+
+\subject{Preliminaries}
+
+In Proposition 1, we define a transformation $A_i$. Since we are
+only concerned with symmetric arrival rates, we only need to work
+with
+
+\starttyping
+Ap(n) := 1 - (1-p)^(n+1);
+\stoptyping
+
+In Definition 3, a function $f_n(x)$ is defined as:
+
+\starttyping
+f(n,x) := 1 + (1-x)^2 - (3+x)*(1-x)^(n+1) ;
+\stoptyping
+
+$s_n$ denotes the root of $f_n(x)$ that is between $[0,1]$. Thus,
+
+\starttyping
+s(n) := find_root( f(n,x), x, 0, 1 )$
+\stoptyping
+
+$τ$ is the root of $x = (1-x)^2$ that lies in $[0,1]$. Thus,
+
+\starttyping
+tau : find_root( (1-x)^2 = x, x, 0, 1 )$
+
+display(tau)$
+\stoptyping
+
+\startformula 
+\tau=.3819660112501052
+ \stopformula
+
+\subject{Dynamic program}
+
+Although the reachable state space is countable, the value function
+can be written succiently. We use different variable names for each
+form of the value function:
+
+\startitemize
+\item
+  $v(p, A^n p)$ = \type{v(n)}
+\item
+  $v(p,1)$ = \type{v_p1}
+\item
+  $v(1,1)$ = \type{v_11}
+\item
+  $v(p,p)$ = \type{v_pp}
+\stopitemize
+
+For reason that will become apparent later, we use \type{v_init}
+for the value of \type{v(1)}.
+
+Similar to the value function, the differential reward function has
+four forms.
+
+\startitemize
+\item
+  $w_{01}(p,A^n p)$ = \type{w01(n)}
+\item
+  $w_{01}(p,1)$ = \type{w01_p1}
+\item
+  $w_{01}(1,1)$ = \type{w01_11}
+\item
+  $w_{01}(p,p)$ = \type{w01_pp}
+\stopitemize
+
+These differential rewards are given by
+
+\starttyping
+w01(n) := r*Ap(n) + 'v_init    $
+w01_p1 :  r       + 'v_init    $
+w01_11 :  r       + 'v_p1      $
+w01_pp :  r*p     + 'v_init    $
+\stoptyping
+
+Similar interpretations hold for $w_{10}$
+
+\starttyping
+w10(n) := r*p + 'v(n+1)    $
+w10_p1 :  r*p + 'v_init    $
+w10_11 :  r   + 'v_p1      $
+w10_pp :  r*p + 'v_init    $
+\stoptyping
+
+and $w_{11}$
+
+\starttyping
+w11(n) := r*(p + Ap(n) - 2*p*Ap(n)) + p*Ap(n)*'v_11 + 
+          (1-p*Ap(n))*'v_pp                           $
+w11_p1 :  r*(1+p-2*p) + p*'v_11 + (1-p)*'v_pp         $
+w11_11 :  'v_11                                       $
+w11_pp :  r*(2*p - 2*p^2) + p^2*'v_11 + (1-p^2)*'v_pp $
+\stoptyping
+
+We need a few helper functions to display the results of
+intermediate calculations.
+
+\starttyping
+show(label, arr, size) := for i : 1 thru size do
+    print(label, i, ":",
+      arr[i], " = ", ev(arr[i], nouns, eval, eval, ratsimp)) $
+
+show_diff(label, arr1, arr2, size) := for i : 1 thru size do
+    print(label, i, ":",
+      arr1[i], 
+      if ev(arr1[i] - arr2[i], nouns, eval, eval, ratsimp) = 0 
+        then "=" else error(arr1[i], "!=", arr2[i]) , 
+       arr2[i]) 
+$
+
+array(check, 4) $
+array(diff,  2) $       
+array(value, 2) $
+\stoptyping
+
+\subject{Case 1 : $p ≥ τ$}
+
+\starttyping
+print("Case 1: p ≥ τ")$ print("--------------") $
+\stoptyping
+
+For this case, we find it more convinient to work with $1-p$ rather
+than $p$. So,
+
+\starttyping
+kill(p) $
+p : 1-q $
+\stoptyping
+
+We claim that
+
+\starttyping
+J    :  r*(1-q^2)       $
+v(n) := r*(1-q^(n+1))   $
+v_p1 :  r               $
+v_11 :  r*(1+q^2)       $
+v_pp :  r*p             $
+
+v_init : v(1)           $
+
+print("value functions")$ display(J, v(n), v_11, v_pp, v_p1)$
+\stoptyping
+
+\bold{value functions}
+\startformula \eqalign{
+  J      &= ( 1-{q}^{2})\,r   \crcr
+  v(n)   &= ( 1-{q}^{n+1})\,r \crcr
+  v_{11} &= ( {q}^{2}+1 ) \,r \crcr
+  v_{pp} &= {q}^{2}\,r        \crcr
+  v_{p1} &= r                 \crcr}
+ \stopformula
+
+To verify the optimal policy, we need to check two things. First,
+we have to verify fixed point equations:
+
+\starttyping
+check[1] : '(v(n) + J - w01(n)) $
+check[2] : '(v_p1 + J - w01_p1) $
+check[3] : '(v_11 + J - w01_11) $
+check[4] : '(v_pp + J - w01_pp) $
+
+show("check", check,4)          $
+\stoptyping
+
+Second, we have to verify that the chosen action gives a larger
+reward than other actions. We treat the four cases separately:
+
+For $(π_1, π_2) = (p, A^n p)$, we have
+
+\starttyping
+diff[1] : '(w01(n) - w10(n)) $ 
+diff[2] : '(w01(n) - w11(n)) $
+
+value[1] : '(r*p*q*(1-q^n))            $
+value[2] : '(r*p^2*(1+q*(1-(2+q)*q^n)))$
+
+show_diff("diff(n)", diff, value, 2) $
+\stoptyping
+
+For $(π_1, π_2) = (p,1)$, we have
+
+\starttyping
+diff[1] : '(w01_p1 - w10_p1)  $
+diff[2] : '(w01_p1 - w11_p1)  $
+
+value[1] : r*q         $
+value[2] : r*p^2*(1+q) $
+
+show_diff("diff_p1", diff, value, 2) $
+\stoptyping
+
+For $(π_1, π_2) = (1,1)$, we have
+
+\starttyping
+diff[1] : '(w01_11 - w10_11)  $  value[1] : 0         $
+diff[2] : '(w01_11 - w11_11)  $  value[2] : r*p*(1+q) $
+
+show_diff("diff_11", diff, value, 2) $
+\stoptyping
+
+For $(π_1, π_2) = (p,p)$, we have
+
+\starttyping
+diff[1] : '(w01_pp - w10_pp)  $
+diff[2] : '(w01_pp - w11_pp)  $  
+
+value[1] : 0             $
+value[2] : r*p^2*(p-q^2) $
+
+show_diff("diff_pp", diff, value, 2) $
+\stoptyping
+
+\subject{Case 2 : $s_1 ≤ p < τ$}
+
+\starttyping
+print("Case 2: s_1 ≤ p < τ")$ print("------------------") $
+\stoptyping
+
+As before, it is more convinient to work with $1-p$ rather than
+$p$. So,
+
+\starttyping
+kill(p) $
+p : 1-q $
+\stoptyping
+
+In this case, only the value function for $v(p,p)$ changes. The
+rest are the same as before
+
+\starttyping
+v_pp :  r*q^2 $
+
+print("value functions")$ display(J, v(n), v_11, v_pp, v_p1)$
+\stoptyping
+
+To verify the optimal policy, we need to check two things. First,
+we verify the fixed point equations. The first three equations
+remain as before, so we only modify the fourth check equation.
+
+\starttyping
+check[4] : '(v_pp + J - w11_pp) $
+
+show("check", check,4)          $
+\stoptyping
+
+Second, we have to verify that the chosen action gives a larger
+reward than other actions. We treat the four cases separately:
+
+For $(π_1, π_2) = (p, A^n p)$, we have
+
+\starttyping
+diff[1] : '(w01(n) - w10(n)) $ 
+diff[2] : '(w01(n) - w11(n)) $
+
+value[1] : '(r*p*q*(1-q^n))  $
+value[2] : r* '(f(n,p) - 3*q^2*(1-q^(n-1)))$
+
+show_diff("diff(n)", diff, value, 2) $
+\stoptyping
+
+For $(π_1, π_2) = (p,1)$, we have
+
+\starttyping
+diff[1] : '(w01_p1 - w10_p1)  $
+diff[2] : '(w01_p1 - w11_p1)  $  
+
+value[1] : r*q        $
+value[2] : -r*f(0,q)  $
+
+show_diff("diff_p1", diff, value, 2) $
+\stoptyping
+
+For $(π_1, π_2) = (1,1)$, we have
+
+\starttyping
+diff[1] : '(w01_11 - w10_11)  $
+diff[2] : '(w01_11 - w11_11)  $
+
+value[1] : 0         $
+value[2] : r*p*(1+q) $
+
+show_diff("diff_11", diff, value, 2) $
+\stoptyping
+
+For $(π_1, π_2) = (p,p)$, we have
+
+\starttyping
+diff[1] : '(w11_pp - w10_pp)  $
+diff[2] : '(w11_pp - w01_pp)  $
+
+value[1] : r*(q^2 - p) $
+value[2] : r*(q^2 - p) $
+
+show_diff("diff_pp", diff, value, 2) $
+\stoptyping
+
+\subject{Case 3 : $s_{m+1} ≤ p < s_m$}
+
+\starttyping
+print("Case 3: s_(m+1) ≤ p < s_m")$ print("------------------") $
+\stoptyping
+
+In this case, it is more convinient to work with $p$ rather than
+$1-p$. So,
+
+\starttyping
+kill(p) $
+q : 1-p $
+\stoptyping
+
+In many ways, this is the most difficult case. Part of the
+difficulty arises from the fact that the form of the value
+functions are more complicated.
+
+\starttyping
+D : 1 + p^2 + p^3             $
+J : r*p*(1-ratsimp(f(0,p))/D) $
+
+v_p1 : J            $
+v_11 : r            $
+v_pp : r*f(1,p)/D   $
+
+c_low(n)  := q*(1-q^n)*J/p + r*q^(n+1) - r*q + v_pp $
+c_high(n) := r*(1-q^(n+1)) + c_low(1) - J           $
+
+v_init : c_low(1) $ 
+\stoptyping
+
+As before, to verify the optimal policy, we need to check two
+things. First, we verify the fixed point equations.
+
+\starttyping
+kill (check)  $ array(check, 5) $
+
+check[1] : '(c_low(n) + J - w11(n))  $
+check[2] : '(c_high(n) + J - w01(n)) $
+check[3] : '(v_p1 + J - w01_p1) $
+check[4] : '(v_11 + J - w01_11) $
+check[5] : '(v_pp + J - w11_pp) $
+
+show("check", check,5)          $
+\stoptyping
+
+For $(π_1, π_2) = (p, A^n p)$, and $n ≤ m$, we have
+
+\starttyping
+v(n) := c_low(n)  $
+diff[1] : '(w11(n) - w10(n)) $ 
+diff[2] : '(w11(n) - w01(n)) $
+
+value[1] : -r*p*(1-q^(n+1))*'f(0,p)/D   $
+value[2] : -r*p^2*f(n,p)/D              $
+
+show_diff("diff(n)", diff, value, 2) $
+\stoptyping
+
+For $(π_1, π_2) = (p, A^n p)$, and $n > m$, we have
+
+\starttyping
+v(n) := c_high(n)  $
+diff[1] : '(w01(n) - w10(n)) $ 
+diff[2] : '(w01(n) - w11(n)) $
+
+value[1] : r*p*(- f(0,p)/D - q^(n+1))   $
+value[2] : r*p^2*f(n,p)/D               $
+
+show_diff("diff(n)", diff, value, 2) $
+\stoptyping
+
+For $(π_1, π_2) = (p,1)$, we have
+
+\starttyping
+diff[1] : '(w01_p1 - w10_p1)  $
+diff[2] : '(w01_p1 - w11_p1)  $  
+
+value[1] : r*q        $
+value[2] : r*p^2*(1+q^2)/D    $
+
+show_diff("diff_p1", diff, value, 2) $
+\stoptyping
+
+For $(π_1, π_2) = (1,1)$, we have
+
+\starttyping
+diff[1] : '(w01_11 - w10_11)  $
+diff[2] : '(w01_11 - w11_11)  $
+
+value[1] : 0                   $
+value[2] : r*p*(1+p)*(1+q^2)/D $
+
+show_diff("diff_11", diff, value, 2) $
+\stoptyping
+
+For $(π_1, π_2) = (p,p)$, we have
+
+\starttyping
+diff[1] : '(w11_pp - w10_pp)  $
+diff[2] : '(w11_pp - w01_pp)  $
+
+value[1] : r*p^2*(1-2*p^2)/D  $
+value[2] : r*p^2*(1-2*p^2)/D  $
+
+show_diff("diff_pp", diff, value, 2) $
+\stoptyping
+
