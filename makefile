@@ -1,4 +1,4 @@
-all: value-function.pdf
+all: value-function.pdf value-function.html
 
 value-function.mac: value-function.txt
 	cat value-function.txt | runhaskell extract-code.hs > value-function.mac
@@ -11,3 +11,6 @@ value-function.tex: value-function.txt
 
 value-function.pdf: value-function.tex wrapper.tex result.txt
 	texexec wrapper.tex --result=value-function
+
+value-function.html: value-function.txt
+	pandoc value-function.txt | tidy -utf8 > value-function.html

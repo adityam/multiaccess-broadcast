@@ -1,0 +1,456 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+<head>
+<meta name="generator" content=
+"HTML Tidy for Linux (vers 25 March 2009), see www.w3.org">
+<title></title>
+</head>
+<body>
+<p>This is <a href="http://maxima.sourceforge.net/">maxima</a>
+source code to verify the calculations presented in the appendix
+of</p>
+<blockquote>
+<p>Aditya Mahajan, “Optimal decentralized transmission policies for
+two-user multiple access broadcast”, in Proceedings of the 2010
+conference on decision and control (CDC).</p>
+</blockquote>
+<div id="preliminaries">
+<h1>Preliminaries</h1>
+<p>In Proposition 1, we define a transformation <span class=
+"math"><em>A</em><sub>i</sub></span>. Since we are only concerned
+with symmetric arrival rates, we only need to work with</p>
+<pre>
+<code>Ap(n) := 1 - (1-p)^(n+1);
+</code>
+</pre>
+<p>In Definition 3, a function <span class=
+"math"><em>f</em><sub>n</sub>(<em>x</em>)</span> is defined as:</p>
+<pre>
+<code>f(n,x) := 1 + (1-x)^2 - (3+x)*(1-x)^(n+1) ;
+</code>
+</pre>
+<p><span class="math"><em>s</em><sub>n</sub></span> denotes the
+root of <span class=
+"math"><em>f</em><sub>n</sub>(<em>x</em>)</span> that is between
+<span class="math">[0,1]</span>. Thus,</p>
+<pre>
+<code>s(n) := find_root( f(n,x), x, 0, 1 )$
+</code>
+</pre>
+<p><span class="math"><em>τ</em></span> is the root of <span class=
+"math"><em>x</em>=(1-<em>x</em>)<sup>2</sup></span> that lies in
+<span class="math">[0,1]</span>. Thus,</p>
+<pre>
+<code>tau : find_root( (1-x)^2 = x, x, 0, 1 )$
+
+display(tau)$
+</code>
+</pre>
+<p><span class="math">τ=.3819660112501052</span></p>
+</div>
+<div id="dynamic-program">
+<h1>Dynamic program</h1>
+<p>Although the reachable state space is countable, the value
+function can be written succiently. We use different variable names
+for each form of the value function:</p>
+<ul>
+<li><span class=
+"math"><em>v</em>(<em>p</em>,<em>A</em><sup>n</sup><em>p</em>)</span>
+= <code>v(n)</code></li>
+<li><span class="math"><em>v</em>(<em>p</em>,1)</span> =
+<code>v_p1</code></li>
+<li><span class="math"><em>v</em>(1,1)</span> =
+<code>v_11</code></li>
+<li><span class="math"><em>v</em>(<em>p</em>,<em>p</em>)</span> =
+<code>v_pp</code></li>
+</ul>
+<p>For reason that will become apparent later, we use
+<code>v_init</code> for the value of <code>v(1)</code>.</p>
+<p>Similar to the value function, the differential reward function
+has four forms.</p>
+<ul>
+<li><span class=
+"math"><em>w</em><sub>01</sub>(<em>p</em>,<em>A</em><sup>n</sup><em>p</em>)</span>
+= <code>w01(n)</code></li>
+<li><span class="math"><em>w</em><sub>01</sub>(<em>p</em>,1)</span>
+= <code>w01_p1</code></li>
+<li><span class="math"><em>w</em><sub>01</sub>(1,1)</span> =
+<code>w01_11</code></li>
+<li><span class=
+"math"><em>w</em><sub>01</sub>(<em>p</em>,<em>p</em>)</span> =
+<code>w01_pp</code></li>
+</ul>
+<p>These differential rewards are given by</p>
+<pre>
+<code>w01(n) := r*Ap(n) + 'v_init    $
+w01_p1 :  r       + 'v_init    $
+w01_11 :  r       + 'v_p1      $
+w01_pp :  r*p     + 'v_init    $
+</code>
+</pre>
+<p>Similar interpretations hold for <span class=
+"math"><em>w</em><sub>10</sub></span></p>
+<pre>
+<code>w10(n) := r*p + 'v(n+1)    $
+w10_p1 :  r*p + 'v_init    $
+w10_11 :  r   + 'v_p1      $
+w10_pp :  r*p + 'v_init    $
+</code>
+</pre>
+<p>and <span class="math"><em>w</em><sub>11</sub></span></p>
+<pre>
+<code>w11(n) := r*(p + Ap(n) - 2*p*Ap(n)) + p*Ap(n)*'v_11 + 
+          (1-p*Ap(n))*'v_pp                           $
+w11_p1 :  r*(1+p-2*p) + p*'v_11 + (1-p)*'v_pp         $
+w11_11 :  'v_11                                       $
+w11_pp :  r*(2*p - 2*p^2) + p^2*'v_11 + (1-p^2)*'v_pp $
+</code>
+</pre>
+<p>We need a few helper functions to display the results of
+intermediate calculations.</p>
+<pre>
+<code>show(label, arr, size) := for i : 1 thru size do
+    print(label, i, ":",
+      arr[i], " = ", ev(arr[i], nouns, eval, eval, ratsimp)) $
+
+show_diff(label, arr1, arr2, size) := for i : 1 thru size do
+    print(label, i, ":",
+      arr1[i], 
+      if ev(arr1[i] - arr2[i], nouns, eval, eval, ratsimp) = 0 
+        then "=" else error(arr1[i], "!=", arr2[i]) , 
+       arr2[i]) 
+$
+
+array(check, 4) $
+array(diff,  2) $       
+array(value, 2) $
+</code>
+</pre></div>
+<div id="case-1-:-p-τ">
+<h1>Case 1 : <span class="math"><em>p</em>≥<em>τ</em></span></h1>
+<pre>
+<code>print("")                 $
+print("----------------") $
+print("   Case 1: p ≥ τ") $
+print("----------------") $
+</code>
+</pre>
+<p>For this case, we find it more convinient to work with
+<span class="math">1-<em>p</em></span> rather than <span class=
+"math"><em>p</em></span>. So,</p>
+<pre>
+<code>kill(p) $
+p : 1-q $
+</code>
+</pre>
+<p>We claim that</p>
+<pre>
+<code>J    :  r*(1-q^2)       $
+v(n) := r*(1-q^(n+1))   $
+v_p1 :  r               $
+v_11 :  r*(1+q^2)       $
+v_pp :  r*p             $
+
+v_init : v(1)           $
+
+print("value functions")$ display(J, v(n), v_11, v_pp, v_p1)$
+</code>
+</pre>
+<p><span class=
+"math">\eqalign{<em>J</em>&amp;=(1-{<em>q</em>}<sup>2</sup>)\,<em>r</em>\crcr<em>v</em>(<em>n</em>)&amp;=(1-{<em>q</em>}<sup><em>n</em>+1</sup>)\,<em>r</em>\crcr<em>v</em><sub>11</sub>&amp;=({<em>q</em>}<sup>2</sup>+1)\,<em>r</em>\crcr<em>v</em><sub><em>pp</em></sub>&amp;={<em>q</em>}<sup>2</sup>\,<em>r</em>\crcr<em>v</em><sub><em>p</em>1</sub>&amp;=<em>r</em>\crcr}</span></p>
+<p>To verify the optimal policy, we need to check two things.
+First, we have to verify fixed point equations:</p>
+<pre>
+<code>check[1] : '(v(n) + J - w01(n)) $
+check[2] : '(v_p1 + J - w01_p1) $
+check[3] : '(v_11 + J - w01_11) $
+check[4] : '(v_pp + J - w01_pp) $
+
+show("check", check,4)          $
+</code>
+</pre>
+<p>Second, we have to verify that the chosen action gives a larger
+reward than other actions. We treat the four cases separately:</p>
+<ol style="list-style-type: decimal;">
+<li>
+<p>For <span class=
+"math">(<em>π</em><sub>1</sub>,<em>π</em><sub>2</sub>)=(<em>p</em>,<em>A</em><sup>n</sup><em>p</em>)</span>,
+we have</p>
+<pre>
+<code>diff[1] : '(w01(n) - w10(n)) $ 
+diff[2] : '(w01(n) - w11(n)) $
+
+value[1] : '(r*p*q*(1-q^n))            $
+value[2] : '(r*p^2*(1+q*(1-(2+q)*q^n)))$
+
+show_diff("diff(n)", diff, value, 2) $
+</code>
+</pre></li>
+<li>
+<p>For <span class=
+"math">(<em>π</em><sub>1</sub>,<em>π</em><sub>2</sub>)=(<em>p</em>,1)</span>,
+we have</p>
+<pre>
+<code>diff[1] : '(w01_p1 - w10_p1)  $
+diff[2] : '(w01_p1 - w11_p1)  $
+
+value[1] : r*q         $
+value[2] : r*p^2*(1+q) $
+
+show_diff("diff_p1", diff, value, 2) $
+</code>
+</pre></li>
+<li>
+<p>For <span class=
+"math">(<em>π</em><sub>1</sub>,<em>π</em><sub>2</sub>)=(1,1)</span>,
+we have</p>
+<pre>
+<code>diff[1] : '(w01_11 - w10_11)  $  value[1] : 0         $
+diff[2] : '(w01_11 - w11_11)  $  value[2] : r*p*(1+q) $
+
+show_diff("diff_11", diff, value, 2) $
+</code>
+</pre></li>
+<li>
+<p>For <span class=
+"math">(<em>π</em><sub>1</sub>,<em>π</em><sub>2</sub>)=(<em>p</em>,<em>p</em>)</span>,
+we have</p>
+<pre>
+<code>diff[1] : '(w01_pp - w10_pp)  $
+diff[2] : '(w01_pp - w11_pp)  $  
+
+value[1] : 0             $
+value[2] : r*p^2*(p-q^2) $
+
+show_diff("diff_pp", diff, value, 2) $
+</code>
+</pre></li>
+</ol>
+</div>
+<div id="case-2-:-s_1-p-τ">
+<h1>Case 2 : <span class=
+"math"><em>s</em><sub>1</sub>≤<em>p</em>&lt;<em>τ</em></span></h1>
+<pre>
+<code>print("")                    $
+print("-------------------") $
+print("Case 2: s_1 ≤ p &lt; τ") $
+print("-------------------") $
+</code>
+</pre>
+<p>As before, it is more convinient to work with <span class=
+"math">1-<em>p</em></span> rather than <span class=
+"math"><em>p</em></span>. So,</p>
+<pre>
+<code>kill(p) $
+p : 1-q $
+</code>
+</pre>
+<p>In this case, only the value function for <span class=
+"math"><em>v</em>(<em>p</em>,<em>p</em>)</span> changes. The rest
+are the same as before</p>
+<pre>
+<code>v_pp :  r*q^2 $
+
+print("value functions")$ display(J, v(n), v_11, v_pp, v_p1)$
+</code>
+</pre>
+<p>To verify the optimal policy, we need to check two things.
+First, we verify the fixed point equations. The first three
+equations remain as before, so we only modify the fourth check
+equation.</p>
+<pre>
+<code>check[4] : '(v_pp + J - w11_pp) $
+
+show("check", check,4)          $
+</code>
+</pre>
+<p>Second, we have to verify that the chosen action gives a larger
+reward than other actions. We treat the four cases separately:</p>
+<ol style="list-style-type: decimal;">
+<li>
+<p>For <span class=
+"math">(<em>π</em><sub>1</sub>,<em>π</em><sub>2</sub>)=(<em>p</em>,<em>A</em><sup>n</sup><em>p</em>)</span>,
+we have</p>
+<pre>
+<code>diff[1] : '(w01(n) - w10(n)) $ 
+diff[2] : '(w01(n) - w11(n)) $
+
+value[1] : '(r*p*q*(1-q^n))  $
+value[2] : r* '(f(n,p) - 3*q^2*(1-q^(n-1)))$
+
+show_diff("diff(n)", diff, value, 2) $
+</code>
+</pre></li>
+<li>
+<p>For <span class=
+"math">(<em>π</em><sub>1</sub>,<em>π</em><sub>2</sub>)=(<em>p</em>,1)</span>,
+we have</p>
+<pre>
+<code>diff[1] : '(w01_p1 - w10_p1)  $
+diff[2] : '(w01_p1 - w11_p1)  $  
+
+value[1] : r*q        $
+value[2] : -r*f(0,q)  $
+
+show_diff("diff_p1", diff, value, 2) $
+</code>
+</pre></li>
+<li>
+<p>For <span class=
+"math">(<em>π</em><sub>1</sub>,<em>π</em><sub>2</sub>)=(1,1)</span>,
+we have</p>
+<pre>
+<code>diff[1] : '(w01_11 - w10_11)  $
+diff[2] : '(w01_11 - w11_11)  $
+
+value[1] : 0         $
+value[2] : r*p*(1+q) $
+
+show_diff("diff_11", diff, value, 2) $
+</code>
+</pre></li>
+<li>
+<p>For <span class=
+"math">(<em>π</em><sub>1</sub>,<em>π</em><sub>2</sub>)=(<em>p</em>,<em>p</em>)</span>,
+we have</p>
+<pre>
+<code>diff[1] : '(w11_pp - w10_pp)  $
+diff[2] : '(w11_pp - w01_pp)  $
+
+value[1] : r*(q^2 - p) $
+value[2] : r*(q^2 - p) $
+
+show_diff("diff_pp", diff, value, 2) $
+</code>
+</pre></li>
+</ol>
+</div>
+<div id="case-3-:-s_m1-p-s_m">
+<h1>Case 3 : <span class=
+"math"><em>s</em><sub><em>m</em>+1</sub>≤<em>p</em>&lt;<em>s</em><sub>m</sub></span></h1>
+<pre>
+<code>print("")                          $
+print("-------------------------") $
+print("Case 3: s_(m+1) ≤ p &lt; s_m") $
+print("-------------------------") $
+</code>
+</pre>
+<p>In this case, it is more convinient to work with <span class=
+"math"><em>p</em></span> rather than <span class=
+"math">1-<em>p</em></span>. So,</p>
+<pre>
+<code>kill(p) $
+q : 1-p $
+</code>
+</pre>
+<p>In many ways, this is the most difficult case. Part of the
+difficulty arises from the fact that the form of the value
+functions are more complicated.</p>
+<pre>
+<code>D : 1 + p^2 + p^3             $
+J : r*p*(1-ratsimp(f(0,p))/D) $
+
+v_p1 : J            $
+v_11 : r            $
+v_pp : r*f(1,p)/D   $
+
+c_low(n)  := q*(1-q^n)*J/p + r*q^(n+1) - r*q + v_pp $
+c_high(n) := r*(1-q^(n+1)) + c_low(1) - J           $
+
+v_init : c_low(1) $ 
+</code>
+</pre>
+<p>As before, to verify the optimal policy, we need to check two
+things. First, we verify the fixed point equations.</p>
+<pre>
+<code>kill (check)  $ array(check, 5) $
+
+check[1] : '(c_low(n) + J - w11(n))  $
+check[2] : '(c_high(n) + J - w01(n)) $
+check[3] : '(v_p1 + J - w01_p1) $
+check[4] : '(v_11 + J - w01_11) $
+check[5] : '(v_pp + J - w11_pp) $
+
+show("check", check,5)          $
+</code>
+</pre>
+<ol style="list-style-type: decimal;">
+<li>
+<p>For <span class=
+"math">(<em>π</em><sub>1</sub>,<em>π</em><sub>2</sub>)=(<em>p</em>,<em>A</em><sup>n</sup><em>p</em>)</span>,</p>
+<ol style="list-style-type: lower-alpha;">
+<li>
+<p>for <span class="math"><em>n</em>≤<em>m</em></span>, we have</p>
+<pre>
+<code>v(n) := c_low(n)  $
+diff[1] : '(w11(n) - w10(n)) $ 
+diff[2] : '(w11(n) - w01(n)) $
+
+value[1] : -r*p*(1-q^(n+1))*'f(0,p)/D   $
+value[2] : -r*p^2*f(n,p)/D              $
+
+show_diff("diff(n)", diff, value, 2) $
+</code>
+</pre></li>
+<li>
+<p>for <span class="math"><em>n</em>&gt;<em>m</em></span>, we
+have</p>
+<pre>
+<code>v(n) := c_high(n)  $
+diff[1] : '(w01(n) - w10(n)) $ 
+diff[2] : '(w01(n) - w11(n)) $
+
+value[1] : r*p*(- f(0,p)/D - q^(n+1))   $
+value[2] : r*p^2*f(n,p)/D               $
+
+show_diff("diff(n)", diff, value, 2) $
+</code>
+</pre></li>
+</ol>
+</li>
+<li>
+<p>For <span class=
+"math">(<em>π</em><sub>1</sub>,<em>π</em><sub>2</sub>)=(<em>p</em>,1)</span>,
+we have</p>
+<pre>
+<code>diff[1] : '(w01_p1 - w10_p1)  $
+diff[2] : '(w01_p1 - w11_p1)  $  
+
+value[1] : r*q        $
+value[2] : r*p^2*(1+q^2)/D    $
+
+show_diff("diff_p1", diff, value, 2) $
+</code>
+</pre></li>
+<li>
+<p>For <span class=
+"math">(<em>π</em><sub>1</sub>,<em>π</em><sub>2</sub>)=(1,1)</span>,
+we have</p>
+<pre>
+<code>diff[1] : '(w01_11 - w10_11)  $
+diff[2] : '(w01_11 - w11_11)  $
+
+value[1] : 0                   $
+value[2] : r*p*(1+p)*(1+q^2)/D $
+
+show_diff("diff_11", diff, value, 2) $
+</code>
+</pre></li>
+<li>
+<p>For <span class=
+"math">(<em>π</em><sub>1</sub>,<em>π</em><sub>2</sub>)=(<em>p</em>,<em>p</em>)</span>,
+we have</p>
+<pre>
+<code>diff[1] : '(w11_pp - w10_pp)  $
+diff[2] : '(w11_pp - w01_pp)  $
+
+value[1] : r*p^2*(1-2*p^2)/D  $
+value[2] : r*p^2*(1-2*p^2)/D  $
+
+show_diff("diff_pp", diff, value, 2) $
+</code>
+</pre></li>
+</ol>
+</div>
+</body>
+</html>
