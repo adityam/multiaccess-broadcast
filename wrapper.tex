@@ -1,7 +1,10 @@
 \usemodule[report]
 \enableregime[utf-8]
+\setupcolor[state=start]
+\setupinteraction[style=bold,color=blue]
 
 \setupframedtexts[width=broad]
+
 
 \starttext
 
@@ -13,13 +16,8 @@
 
 \component value-function
 
-\page
-
 \subject {Output}
 
 \typefile{result.txt}
 
 \stoptext
-
- sed -e '/\(Schunk\|Sinput\)/d; s/\\\(begin\|end\){Soutput}/~~~~/; s/^> /    /' bsc-code.tex | pandoc -w context > code.tex
-
