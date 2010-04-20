@@ -107,7 +107,10 @@ calculations.
 Case 1 : $p ≥ τ$
 ================
 
-    print("Case 1: p ≥ τ")$ print("--------------") $
+    print("")                 $
+    print("----------------") $
+    print("\f Case 1: p ≥ τ") $
+    print("----------------") $
 
 For this case, we find it more convinient to work with $1-p$ rather than $p$.
 So,
@@ -191,7 +194,10 @@ For $(π_1, π_2) = (p,p)$, we have
 Case 2 : $s_1 ≤ p < τ$
 =======================
 
-    print("Case 2: s_1 ≤ p < τ")$ print("------------------") $
+    print("")                    $
+    print("-------------------") $
+    print("Case 2: s_1 ≤ p < τ") $
+    print("-------------------") $
 
 As before, it is more convinient to work with $1-p$ rather than $p$.
 So,
@@ -260,7 +266,10 @@ For $(π_1, π_2) = (p,p)$, we have
 Case 3 : $s_{m+1} ≤ p < s_m$
 =============================
 
-    print("Case 3: s_(m+1) ≤ p < s_m")$ print("------------------") $
+    print("")                          $
+    print("-------------------------") $
+    print("Case 3: s_(m+1) ≤ p < s_m") $
+    print("-------------------------") $
 
 In this case, it is more convinient to work with $p$ rather than $1-p$.
 So,
