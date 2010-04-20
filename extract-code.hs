@@ -1,16 +1,13 @@
 import Text.Pandoc
 
-extract :: Block -> Block
-extract buffer@(CodeBlock (id, classes, namevals) contents) = buffer
-extract _ = Para [Space]
+extract :: Block -> [String]
+extract (CodeBlock (id, classes, namevals) contents) = [contents]
+extract _ = []
 
 readDoc :: String -> Pandoc
 readDoc = readMarkdown defaultParserState
 
-writeDoc :: Pandoc -> String
-writeDoc = writeMarkdown defaultWriterOptions 
-
 main :: IO ()
-main = interact (writeDoc . processWith extract . readDoc) 
+main = interact (unlines .queryWith extract . readDoc)
   
 
